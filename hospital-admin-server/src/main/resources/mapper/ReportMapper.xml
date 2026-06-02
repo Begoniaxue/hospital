@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hospital.mapper.ReportMapper">
+
+    <select id="selectDoctorWorkload" resultType="com.hospital.dto.DoctorWorkloadDTO">
+        SELECT
+            t.doctorId,
+            t.doctorName,
+            t.department,
+            IFNULL(r.cnt, 0) AS registrationCount,
+            IFNULL(o.cnt, 0) AS outpatientCount,
+            IFNULL(i.cnt, 0) AS inpatientCount,
+            IFNULL(r.fee, 0) + IFNULL(o.fee, 0) AS totalAmount
+        FROM (
+            SELECT DISTINCT doctor_id AS doctorId, doctor_name AS doctorName, department
+            FROM registration WHERE deleted = 0 AND doctor_id IS NOT NULL
+            UNION
+            SELECT DISTINCT doctor_id AS doctorId, doctor_name AS doctorName, department
+            FROM outpatient_record WHERE deleted = 0 AND doctor_id IS NOT NULL
+            UNION
+            SELECT DISTINCT doctor_id AS doctorId, doctor_name AS doctorName, department
+            FROM inpatient WHERE deleted = 0 AND doctor_id IS NOT NULL
+        ) t
+        LEFT JOIN (
+            SELECT doctor_id, COUNT(*) AS cnt, IFNULL(SUM(registration_fee), 0) AS fee
+            FROM registration WHERE deleted = 0
+            <if test="startDate != null and startDate != ''">
+                AND DATE(create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+            GROUP BY doctor_id
+        ) r ON t.doctorId = r.doctor_id
+        LEFT JOIN (
+            SELECT doctor_id, COUNT(*) AS cnt, IFNULL(SUM(total_amount), 0) AS fee
+            FROM outpatient_record WHERE deleted = 0
+            <if test="startDate != null and startDate != ''">
+                AND DATE(create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+            GROUP BY doctor_id
+        ) o ON t.doctorId = o.doctor_id
+        LEFT JOIN (
+            SELECT doctor_id, COUNT(*) AS cnt
+            FROM inpatient WHERE deleted = 0
+            <if test="startDate != null and startDate != ''">
+                AND DATE(create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+            GROUP BY doctor_id
+        ) i ON t.doctorId = i.doctor_id
+        WHERE 1 = 1
+        <if test="department != null and department != ''">
+            AND t.department = #{department}
+        </if>
+        ORDER BY totalAmount DESC
+    </select>
+
+    <select id="selectRevenueStats" resultType="com.hospital.dto.RevenueReportDTO">
+        SELECT
+            <if test="dimension == 'date' or dimension == 'day'">
+                DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+            </if>
+            <if test="dimension == 'month'">
+                DATE_FORMAT(create_time, '%Y-%m') AS date,
+            </if>
+            <if test="dimension == 'department'">
+                department,
+            </if>
+            <if test="dimension == 'doctor'">
+                doctor_id AS doctorId,
+                doctor_name AS doctorName,
+            </if>
+            IFNULL(SUM(CASE WHEN fee_type = 1 THEN amount ELSE 0 END), 0) AS registrationFee,
+            IFNULL(SUM(CASE WHEN fee_type = 5 THEN amount ELSE 0 END), 0) AS drugFee,
+            IFNULL(SUM(CASE WHEN fee_type = 3 OR fee_type = 4 THEN amount ELSE 0 END), 0) AS examFee,
+            IFNULL(SUM(CASE WHEN fee_type = 2 OR fee_type = 7 THEN amount ELSE 0 END), 0) AS treatmentFee,
+            IFNULL(SUM(CASE WHEN fee_type = 1 THEN amount ELSE 0 END), 0) AS inpatientFee,
+            IFNULL(SUM(CASE WHEN fee_type = 6 OR fee_type = 8 THEN amount ELSE 0 END), 0) AS otherFee,
+            IFNULL(SUM(amount), 0) AS totalAmount
+        FROM (
+            SELECT create_time, department, registration_fee AS amount, 1 AS fee_type, doctor_id, doctor_name
+            FROM registration WHERE deleted = 0
+            UNION ALL
+            SELECT create_time, department, total_amount AS amount, 5 AS fee_type, doctor_id, doctor_name
+            FROM outpatient_record WHERE deleted = 0
+            UNION ALL
+            SELECT f.create_time, i.department, f.amount, f.fee_type, NULL AS doctor_id, NULL AS doctor_name
+            FROM inpatient_fee f
+            LEFT JOIN inpatient i ON f.inpatient_id = i.id AND i.deleted = 0
+            WHERE f.deleted = 0
+        ) AS fee_all
+        WHERE 1 = 1
+        <if test="startDate != null and startDate != ''">
+            AND DATE(create_time) >= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND DATE(create_time) &lt;= #{endDate}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        <if test="doctorId != null">
+            AND doctor_id = #{doctorId}
+        </if>
+        GROUP BY
+            <if test="dimension == 'date' or dimension == 'day' or dimension == 'month'">
+                date
+            </if>
+            <if test="dimension == 'department'">
+                department
+            </if>
+            <if test="dimension == 'doctor'">
+                doctorId, doctorName
+            </if>
+            <if test="dimension != 'date' and dimension != 'day' and dimension != 'month' and dimension != 'department' and dimension != 'doctor'">
+                1
+            </if>
+        ORDER BY
+            <if test="dimension == 'date' or dimension == 'day' or dimension == 'month'">
+                date DESC
+            </if>
+            <if test="dimension == 'department' or dimension == 'doctor'">
+                totalAmount DESC
+            </if>
+    </select>
+
+    <select id="selectDrugStockStats" resultType="com.hospital.dto.DrugStockReportDTO">
+        SELECT
+            d.id AS drugId,
+            d.drug_code AS drugCode,
+            d.name AS drugName,
+            d.specification,
+            d.unit,
+            IFNULL(d.stock, 0) - IFNULL(SUM(CASE WHEN l.type = 1 THEN l.quantity ELSE 0 END), 0) + IFNULL(SUM(CASE WHEN l.type = 2 THEN l.quantity ELSE 0 END), 0) AS beginStock,
+            IFNULL(SUM(CASE WHEN l.type = 1 THEN l.quantity ELSE 0 END), 0) AS inQuantity,
+            IFNULL(SUM(CASE WHEN l.type = 2 THEN l.quantity ELSE 0 END), 0) AS outQuantity,
+            IFNULL(d.stock, 0) AS endStock,
+            d.price AS unitPrice,
+            IFNULL(d.stock, 0) * d.price AS stockValue
+        FROM drug d
+        LEFT JOIN drug_stock_log l ON d.id = l.drug_id
+            <if test="startDate != null and startDate != ''">
+                AND DATE(l.create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(l.create_time) &lt;= #{endDate}
+            </if>
+        WHERE d.deleted = 0
+        GROUP BY d.id, d.drug_code, d.name, d.specification, d.unit, d.stock, d.price
+        ORDER BY d.id
+    </select>
+
+    <select id="selectPatientTrend" resultType="com.hospital.dto.PatientTrendDTO">
+        SELECT
+            date,
+            SUM(registrationCount) AS registrationCount,
+            SUM(outpatientCount) AS outpatientCount,
+            SUM(inpatientCount) AS inpatientCount,
+            SUM(registrationCount) + SUM(outpatientCount) + SUM(inpatientCount) AS totalCount
+        FROM (
+            SELECT
+                DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+                COUNT(*) AS registrationCount,
+                0 AS outpatientCount,
+                0 AS inpatientCount
+            FROM registration
+            WHERE deleted = 0
+            <if test="startDate != null and startDate != ''">
+                AND DATE(create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+            GROUP BY date
+            UNION ALL
+            SELECT
+                DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+                0 AS registrationCount,
+                COUNT(*) AS outpatientCount,
+                0 AS inpatientCount
+            FROM outpatient_record
+            WHERE deleted = 0
+            <if test="startDate != null and startDate != ''">
+                AND DATE(create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+            GROUP BY date
+            UNION ALL
+            SELECT
+                DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+                0 AS registrationCount,
+                0 AS outpatientCount,
+                COUNT(*) AS inpatientCount
+            FROM inpatient
+            WHERE deleted = 0
+            <if test="startDate != null and startDate != ''">
+                AND DATE(create_time) >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(create_time) &lt;= #{endDate}
+            </if>
+            GROUP BY date
+        ) AS patient_trend
+        GROUP BY date
+        ORDER BY date DESC
+    </select>
+
+</mapper>

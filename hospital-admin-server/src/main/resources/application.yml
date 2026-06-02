@@ -48,3 +48,7 @@ captcha:
   expire: 120
   width: 111
   height: 36
+
+wechat:
+  appid: wx1234567890abcdef
+  secret: your_wechat_app_secret_here
