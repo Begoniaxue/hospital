@@ -1,0 +1,50 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /api
+
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: hospital-admin-server
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/hospital_admin?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: root
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 0
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.hospital.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+jwt:
+  secret: hospital-admin-secret-key-2024-very-long-secret-key-for-jwt-signing
+  expiration: 86400000
+  header: Authorization
+
+captcha:
+  expire: 120
+  width: 111
+  height: 36

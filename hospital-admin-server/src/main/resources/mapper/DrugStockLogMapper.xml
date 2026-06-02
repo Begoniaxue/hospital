@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hospital.mapper.DrugStockLogMapper">
+
+    <select id="selectStockLogPage" resultType="com.hospital.entity.DrugStockLog">
+        SELECT l.*, d.name as drug_name FROM drug_stock_log l
+        LEFT JOIN drug d ON l.drug_id = d.id
+        WHERE 1=1
+        <if test="drugId != null">
+            AND l.drug_id = #{drugId}
+        </if>
+        <if test="type != null">
+            AND l.type = #{type}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND l.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND l.create_time &lt;= #{endTime}
+        </if>
+        ORDER BY l.create_time DESC
+    </select>
+</mapper>
