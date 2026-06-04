@@ -10,7 +10,7 @@
                 <view class="section-title">就诊信息</view>
                 <view class="info-row">
                     <text class="info-label">就诊科室</text>
-                    <text class="info-value">{{ registerData.departmentName }}</text>
+                    <text class="info-value">{{ displayDepartmentName }}</text>
                 </view>
                 <view class="info-row">
                     <text class="info-label">就诊医生</text>
@@ -18,7 +18,7 @@
                 </view>
                 <view class="info-row">
                     <text class="info-label">就诊日期</text>
-                    <text class="info-value">{{ registerData.dateText }} {{ registerData.period === 'morning' ? '上午' : '下午' }}</text>
+                    <text class="info-value">{{ displayDateText }}</text>
                 </view>
                 <view class="info-row">
                     <text class="info-label">就诊时段</text>
@@ -26,7 +26,7 @@
                 </view>
                 <view class="info-row">
                     <text class="info-label">挂号费用</text>
-                    <text class="info-value price">¥{{ registerData.fee }}</text>
+                    <text class="info-value price">¥{{ displayFee }}</text>
                 </view>
             </view>
 
@@ -80,7 +80,7 @@
         <view class="footer">
             <view class="total-info">
                 <text class="total-label">挂号费用</text>
-                <text class="total-price">¥{{ registerData.fee }}</text>
+                <text class="total-price">¥{{ displayFee }}</text>
             </view>
             <button class="btn-confirm" @click="handleConfirm" :disabled="!selectedPatientId || submitting">
                 {{ submitting ? '提交中...' : '确认挂号' }}
@@ -100,6 +100,20 @@ export default {
             registerData: {},
             patients: [],
             selectedPatientId: null
+        }
+    },
+    computed: {
+        displayDepartmentName() {
+            return this.registerData.departmentName || this.registerData.department || ''
+        },
+        displayFee() {
+            const fee = this.registerData.fee || this.registerData.consultationFee || this.registerData.registrationFee || 0
+            return fee
+        },
+        displayDateText() {
+            const dateText = this.registerData.dateText || ''
+            const periodText = this.registerData.period === 'morning' ? '上午' : '下午'
+            return dateText ? `${dateText} ${periodText}` : `${this.registerData.date || ''} ${periodText}`
         }
     },
     onLoad(options) {

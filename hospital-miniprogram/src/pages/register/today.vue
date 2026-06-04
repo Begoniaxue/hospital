@@ -60,7 +60,7 @@
                                 <text class="slot-remaining" :class="{ full: doctor.morningRemaining <= 0 }">
                                     {{ doctor.morningRemaining <= 0 ? '约满' : '剩余' + doctor.morningRemaining + '号' }}
                                 </text>
-                                <text class="slot-price">¥{{ doctor.fee }}</text>
+                                <text class="slot-price">¥{{ doctor.consultationFee || doctor.fee || '0' }}</text>
                             </view>
                             <view 
                                 class="slot-item" 
@@ -76,7 +76,7 @@
                                 <text class="slot-remaining" :class="{ full: doctor.afternoonRemaining <= 0 }">
                                     {{ doctor.afternoonRemaining <= 0 ? '约满' : '剩余' + doctor.afternoonRemaining + '号' }}
                                 </text>
-                                <text class="slot-price">¥{{ doctor.fee }}</text>
+                                <text class="slot-price">¥{{ doctor.consultationFee || doctor.fee || '0' }}</text>
                             </view>
                         </view>
                     </view>
@@ -98,7 +98,7 @@
                 <text class="selected-text">{{ selectedSlot.doctorName }} - {{ selectedSlot.period === 'morning' ? '上午' : '下午' }}</text>
             </view>
             <button class="btn-register" @click="goToConfirm">
-                立即挂号 ¥{{ selectedSlot.fee }}
+                立即挂号 ¥{{ selectedSlot.fee || '0' }}
             </button>
         </view>
     </view>
@@ -188,8 +188,10 @@ export default {
             this.selectedSlot = {
                 doctorId: doctor.id,
                 doctorName: doctor.name,
+                departmentId: doctor.departmentId,
+                departmentName: doctor.departmentName,
                 period: period,
-                fee: doctor.fee,
+                fee: doctor.consultationFee || doctor.fee,
                 scheduleId: doctor[period + 'ScheduleId']
             }
         },
@@ -206,10 +208,13 @@ export default {
                 url: '/pages/register/confirm?data=' + encodeURIComponent(JSON.stringify({
                     doctorId: this.selectedSlot.doctorId,
                     doctorName: this.selectedSlot.doctorName,
+                    departmentId: this.selectedSlot.departmentId,
+                    departmentName: this.selectedSlot.departmentName,
                     scheduleId: this.selectedSlot.scheduleId,
                     period: this.selectedSlot.period,
                     fee: this.selectedSlot.fee,
                     date: new Date().toISOString().split('T')[0],
+                    dateText: this.formatDate(new Date()),
                     isToday: true
                 }))
             })
