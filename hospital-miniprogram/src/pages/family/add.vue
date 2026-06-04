@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import { addFamilyMember } from '../../api/family.js'
+import { addFamilyMember, getFamilyList } from '../../api/family.js'
 
 export default {
     data() {
@@ -185,6 +185,34 @@ export default {
                         title: res.data.message || '添加成功',
                         icon: 'success'
                     })
+
+                    if (res.data && res.data.family) {
+                        const newFamily = {
+                            ...res.data.family,
+                            id: res.data.family.patientId || res.data.family.id
+                        }
+
+                        if (res.data.patient) {
+                            this.$store.commit('SET_CURRENT_PATIENT', res.data.patient)
+                            uni.setStorageSync('currentPatient', res.data.patient)
+                            this.$store.commit('UPDATE_CURRENT_PATIENT_ID', res.data.patient.id)
+                        }
+
+                        try {
+                            const familyRes = await getFamilyList(this.form.wechatUserId)
+                            if (familyRes.code === 200 && familyRes.data) {
+                                const familyList = familyRes.data.map(item => ({
+                                    ...item,
+                                    id: item.patientId || item.id
+                                }))
+                                this.$store.commit('SET_FAMILY_LIST', familyList)
+                                uni.setStorageSync('familyList', familyList)
+                                uni.setStorageSync('familyMembers', familyList)
+                            }
+                        } catch (e) {
+                            console.error('刷新就诊人列表失败', e)
+                        }
+                    }
 
                     setTimeout(() => {
                         uni.navigateBack()

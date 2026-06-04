@@ -3,9 +3,17 @@
         <view class="section">
             <view class="section-title">门诊服务</view>
             <view class="service-grid">
+                <view class="service-item" @click="handleService('guide')">
+                    <view class="service-icon">🤖</view>
+                    <text class="service-text">智能导诊</text>
+                </view>
                 <view class="service-item" @click="handleService('register')">
                     <view class="service-icon">📅</view>
                     <text class="service-text">预约挂号</text>
+                </view>
+                <view class="service-item" @click="handleService('today-register')">
+                    <view class="service-icon">⏰</view>
+                    <text class="service-text">当日挂号</text>
                 </view>
                 <view class="service-item" @click="handleService('payment')">
                     <view class="service-icon">💳</view>
@@ -168,34 +176,37 @@ export default {
     },
     methods: {
         handleService(type) {
+            const currentPatient = this.$store.state.currentPatient || uni.getStorageSync('currentPatient')
+            
             const typeMap = {
+                'register': '/pages/register/index',
                 'appointment-list': '/pages/appointment/list',
                 'health-card': '/pages/family/qrcode',
-                'medical-insurance': '/pages/family/qrcode'
+                'medical-insurance': '/pages/family/qrcode',
+                'guide': '/pages/guide/index',
+                'today-register': '/pages/register/today'
             }
 
             if (typeMap[type]) {
-                if (type === 'appointment-list') {
-                    uni.showToast({
-                        title: '功能开发中',
-                        icon: 'none'
-                    })
-                    return
-                }
-                const currentPatient = this.$store.state.currentPatient || uni.getStorageSync('currentPatient')
-                if (!currentPatient) {
+                if (type !== 'guide' && !currentPatient) {
                     uni.showToast({
                         title: '请先完成实名认证',
                         icon: 'none'
                     })
                     return
                 }
+                
                 if (type === 'health-card' || type === 'medical-insurance') {
                     uni.navigateTo({
                         url: '/pages/family/qrcode?patientId=' + currentPatient.id + '&name=' + currentPatient.name
                     })
                     return
                 }
+                
+                uni.navigateTo({
+                    url: typeMap[type]
+                })
+                return
             }
 
             uni.showToast({

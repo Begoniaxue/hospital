@@ -1,0 +1,18 @@
+ALTER TABLE registration MODIFY COLUMN department VARCHAR(50) NULL;
+ALTER TABLE registration ADD COLUMN department_id BIGINT AFTER department;
+ALTER TABLE registration ADD COLUMN department_name VARCHAR(100) AFTER department_id;
+ALTER TABLE registration ADD COLUMN schedule_id BIGINT AFTER department_name;
+ALTER TABLE registration ADD COLUMN visit_location VARCHAR(200) AFTER visit_time_slot;
+ALTER TABLE registration ADD COLUMN queue_number INT AFTER visit_location;
+ALTER TABLE registration ADD COLUMN checkin_time DATETIME AFTER queue_number;
+ALTER TABLE registration ADD COLUMN consult_time DATETIME AFTER checkin_time;
+ALTER TABLE registration ADD COLUMN finish_time DATETIME AFTER consult_time;
+ALTER TABLE registration ADD COLUMN cancel_time DATETIME AFTER finish_time;
+ALTER TABLE registration ADD COLUMN cancel_reason VARCHAR(500) AFTER cancel_time;
+ALTER TABLE registration ADD COLUMN refund_amount DECIMAL(10,2) AFTER cancel_reason;
+ALTER TABLE registration ADD COLUMN refund_time DATETIME AFTER refund_amount;
+ALTER TABLE registration ADD COLUMN medical_insurance_settle INT AFTER refund_time;
+ALTER TABLE registration ADD COLUMN medical_insurance_amount DECIMAL(10,2) AFTER medical_insurance_settle;
+ALTER TABLE registration ADD COLUMN out_pocket_amount DECIMAL(10,2) AFTER medical_insurance_amount;
+ALTER TABLE registration ADD COLUMN his_registration_no VARCHAR(50) AFTER out_pocket_amount;
+ALTER TABLE registration ADD COLUMN is_notified INT AFTER his_registration_no;

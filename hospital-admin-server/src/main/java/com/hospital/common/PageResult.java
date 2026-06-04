@@ -28,4 +28,11 @@ public class PageResult<T> {
         result.setRecords(records);
         return result;
     }
+
+    public static <T> PageResult<T> of(com.baomidou.mybatisplus.extension.plugins.pagination.Page<T> page) {
+        PageResult<T> result = new PageResult<>();
+        result.setTotal(page.getTotal());
+        result.setRecords(page.getRecords());
+        return result;
+    }
 }

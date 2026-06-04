@@ -116,6 +116,90 @@
             "style": {
                 "navigationBarTitleText": "编辑个人信息"
             }
+        },
+        {
+            "path": "pages/guide/index",
+            "style": {
+                "navigationBarTitleText": "智能导诊"
+            }
+        },
+        {
+            "path": "pages/guide/result",
+            "style": {
+                "navigationBarTitleText": "导诊结果"
+            }
+        },
+        {
+            "path": "pages/register/index",
+            "style": {
+                "navigationBarTitleText": "预约挂号"
+            }
+        },
+        {
+            "path": "pages/register/today",
+            "style": {
+                "navigationBarTitleText": "当日挂号"
+            }
+        },
+        {
+            "path": "pages/register/department",
+            "style": {
+                "navigationBarTitleText": "选择科室"
+            }
+        },
+        {
+            "path": "pages/register/doctor-list",
+            "style": {
+                "navigationBarTitleText": "选择医生"
+            }
+        },
+        {
+            "path": "pages/register/doctor-detail",
+            "style": {
+                "navigationBarTitleText": "医生详情"
+            }
+        },
+        {
+            "path": "pages/register/confirm",
+            "style": {
+                "navigationBarTitleText": "确认挂号"
+            }
+        },
+        {
+            "path": "pages/register/pay",
+            "style": {
+                "navigationBarTitleText": "挂号支付"
+            }
+        },
+        {
+            "path": "pages/register/success",
+            "style": {
+                "navigationBarTitleText": "挂号成功"
+            }
+        },
+        {
+            "path": "pages/appointment/list",
+            "style": {
+                "navigationBarTitleText": "我的挂号"
+            }
+        },
+        {
+            "path": "pages/appointment/detail",
+            "style": {
+                "navigationBarTitleText": "挂号详情"
+            }
+        },
+        {
+            "path": "pages/appointment/queue",
+            "style": {
+                "navigationBarTitleText": "候诊排队"
+            }
+        },
+        {
+            "path": "pages/search/index",
+            "style": {
+                "navigationBarTitleText": "搜索"
+            }
         }
     ],
     "globalStyle": {

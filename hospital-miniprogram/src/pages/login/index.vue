@@ -17,6 +17,19 @@
                 微信一键登录
             </button>
 
+            <view class="mock-login" v-if="isH5">
+                <view class="divider">
+                    <text class="divider-text">H5 测试登录</text>
+                </view>
+                <button class="btn-mock" @click="handleMockLogin">
+                    <text class="mock-icon">🔓</text>
+                    Mock 账号登录
+                </button>
+                <view class="mock-tip">
+                    <text>登录后自动创建测试患者，可直接体验所有功能</text>
+                </view>
+            </view>
+
             <view class="other-login" v-if="false">
                 <text class="other-text">其他登录方式</text>
                 <view class="phone-login" @click="handlePhoneLogin">
@@ -33,11 +46,22 @@ import { wechatLogin } from '../../api/auth.js'
 export default {
     data() {
         return {
-            loading: false
+            loading: false,
+            isH5: false
         }
+    },
+    onLoad() {
+        // #ifdef H5
+        this.isH5 = true
+        // #endif
     },
     methods: {
         async handleWechatLogin() {
+            // #ifdef H5
+            this.handleMockLogin()
+            return
+            // #endif
+
             if (this.loading) return
             this.loading = true
 
@@ -82,6 +106,7 @@ export default {
                     uni.hideLoading()
 
                     if (wechatUser.currentPatientId) {
+                        await this.$store.dispatch('getCurrentPatient', wechatUser.currentPatientId)
                         uni.switchTab({
                             url: '/pages/index/index'
                         })
@@ -114,11 +139,13 @@ export default {
         },
 
         async handleMockLogin() {
+            if (this.loading) return
+            this.loading = true
             uni.showLoading({ title: '登录中...' })
             try {
                 const loginData = {
                     code: 'mock_code_' + Date.now(),
-                    nickName: '微信用户',
+                    nickName: '测试用户',
                     avatarUrl: 'https://thirdwx.qlogo.cn/mmopen/vi_32/default_avatar',
                     gender: 1
                 }
@@ -138,9 +165,15 @@ export default {
 
                     if (wechatUser.currentPatientId) {
                         await this.$store.dispatch('getCurrentPatient', wechatUser.currentPatientId)
-                        uni.switchTab({
-                            url: '/pages/index/index'
+                        uni.showToast({
+                            title: '登录成功',
+                            icon: 'success'
                         })
+                        setTimeout(() => {
+                            uni.switchTab({
+                                url: '/pages/index/index'
+                            })
+                        }, 500)
                     } else {
                         uni.showToast({
                             title: '请先完成实名认证',
@@ -154,11 +187,14 @@ export default {
                     }
                 }
             } catch (e) {
+                console.error('Mock登录失败', e)
                 uni.hideLoading()
                 uni.showToast({
-                    title: '登录失败，请重试',
+                    title: '登录失败，请检查后端服务',
                     icon: 'none'
                 })
+            } finally {
+                this.loading = false
             }
         },
 
@@ -245,6 +281,60 @@ export default {
 .wechat-icon {
     margin-right: 16rpx;
     font-size: 36rpx;
+}
+
+.mock-login {
+    margin-top: 48rpx;
+    text-align: center;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32rpx;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.divider-text {
+    padding: 0 24rpx;
+    font-size: 24rpx;
+    color: #999;
+}
+
+.btn-mock {
+    width: 100%;
+    height: 96rpx;
+    background: #ff6b6b;
+    color: #fff;
+    border-radius: 48rpx;
+    font-size: 32rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+.btn-mock:active {
+    opacity: 0.85;
+}
+
+.mock-icon {
+    margin-right: 16rpx;
+    font-size: 36rpx;
+}
+
+.mock-tip {
+    margin-top: 24rpx;
+    font-size: 24rpx;
+    color: #999;
+    line-height: 1.6;
 }
 
 .other-login {

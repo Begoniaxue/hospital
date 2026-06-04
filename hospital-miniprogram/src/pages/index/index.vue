@@ -210,9 +210,8 @@ export default {
         },
 
         navigateTo(url) {
-            if (url.includes('/register/') || url.includes('/payment/') || url.includes('/report/') ||
-                url.includes('/pharmacy/') || url.includes('/doctor/') || url.includes('/dept/') ||
-                url.includes('/appointment/')) {
+            if (url.includes('/payment/') || url.includes('/report/') ||
+                url.includes('/pharmacy/') || url.includes('/dept/')) {
                 uni.showToast({
                     title: '功能开发中',
                     icon: 'none'
@@ -220,6 +219,18 @@ export default {
                 return
             }
             uni.navigateTo({ url })
+        },
+
+        handleSearch() {
+            uni.navigateTo({
+                url: '/pages/search/index'
+            })
+        },
+
+        handleGuide() {
+            uni.navigateTo({
+                url: '/pages/guide/index'
+            })
         }
     }
 }

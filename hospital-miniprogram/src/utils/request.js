@@ -1,4 +1,9 @@
+// #ifdef H5
+const BASE_URL = 'http://localhost:8080/api'
+// #endif
+// #ifndef H5
 const BASE_URL = '/api'
+// #endif
 
 const request = (options) => {
     return new Promise((resolve, reject) => {

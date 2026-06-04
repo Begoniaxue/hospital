@@ -24,6 +24,10 @@ public class Registration {
 
     private String department;
 
+    private Long departmentId;
+
+    private Long scheduleId;
+
     private Long doctorId;
 
     private String doctorName;
@@ -39,6 +43,34 @@ public class Registration {
     private LocalDate visitDate;
 
     private String visitTimeSlot;
+
+    private String visitLocation;
+
+    private Integer queueNumber;
+
+    private LocalDateTime checkinTime;
+
+    private LocalDateTime consultTime;
+
+    private LocalDateTime finishTime;
+
+    private LocalDateTime cancelTime;
+
+    private String cancelReason;
+
+    private BigDecimal refundAmount;
+
+    private LocalDateTime refundTime;
+
+    private Integer medicalInsuranceSettle;
+
+    private BigDecimal medicalInsuranceAmount;
+
+    private BigDecimal outPocketAmount;
+
+    private String hisRegistrationNo;
+
+    private Integer isNotified;
 
     private Integer status;
 
@@ -117,6 +149,22 @@ public class Registration {
         this.department = department;
     }
 
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
+    }
+
+    public void setScheduleId(Long scheduleId) {
+        this.scheduleId = scheduleId;
+    }
+
     public Long getDoctorId() {
         return doctorId;
     }
@@ -179,6 +227,118 @@ public class Registration {
 
     public void setVisitTimeSlot(String visitTimeSlot) {
         this.visitTimeSlot = visitTimeSlot;
+    }
+
+    public String getVisitLocation() {
+        return visitLocation;
+    }
+
+    public void setVisitLocation(String visitLocation) {
+        this.visitLocation = visitLocation;
+    }
+
+    public Integer getQueueNumber() {
+        return queueNumber;
+    }
+
+    public void setQueueNumber(Integer queueNumber) {
+        this.queueNumber = queueNumber;
+    }
+
+    public LocalDateTime getCheckinTime() {
+        return checkinTime;
+    }
+
+    public void setCheckinTime(LocalDateTime checkinTime) {
+        this.checkinTime = checkinTime;
+    }
+
+    public LocalDateTime getConsultTime() {
+        return consultTime;
+    }
+
+    public void setConsultTime(LocalDateTime consultTime) {
+        this.consultTime = consultTime;
+    }
+
+    public LocalDateTime getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(LocalDateTime finishTime) {
+        this.finishTime = finishTime;
+    }
+
+    public LocalDateTime getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(LocalDateTime cancelTime) {
+        this.cancelTime = cancelTime;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public BigDecimal getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(BigDecimal refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
+    public LocalDateTime getRefundTime() {
+        return refundTime;
+    }
+
+    public void setRefundTime(LocalDateTime refundTime) {
+        this.refundTime = refundTime;
+    }
+
+    public Integer getMedicalInsuranceSettle() {
+        return medicalInsuranceSettle;
+    }
+
+    public void setMedicalInsuranceSettle(Integer medicalInsuranceSettle) {
+        this.medicalInsuranceSettle = medicalInsuranceSettle;
+    }
+
+    public BigDecimal getMedicalInsuranceAmount() {
+        return medicalInsuranceAmount;
+    }
+
+    public void setMedicalInsuranceAmount(BigDecimal medicalInsuranceAmount) {
+        this.medicalInsuranceAmount = medicalInsuranceAmount;
+    }
+
+    public BigDecimal getOutPocketAmount() {
+        return outPocketAmount;
+    }
+
+    public void setOutPocketAmount(BigDecimal outPocketAmount) {
+        this.outPocketAmount = outPocketAmount;
+    }
+
+    public String getHisRegistrationNo() {
+        return hisRegistrationNo;
+    }
+
+    public void setHisRegistrationNo(String hisRegistrationNo) {
+        this.hisRegistrationNo = hisRegistrationNo;
+    }
+
+    public Integer getIsNotified() {
+        return isNotified;
+    }
+
+    public void setIsNotified(Integer isNotified) {
+        this.isNotified = isNotified;
     }
 
     public Integer getStatus() {
