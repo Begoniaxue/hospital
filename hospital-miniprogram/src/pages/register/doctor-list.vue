@@ -83,7 +83,7 @@ export default {
     },
     onLoad(options) {
         this.departmentId = options.departmentId
-        this.departmentName = options.departmentName || '科室医生'
+        this.departmentName = options.departmentName || ''
         this.generateDateList()
         this.loadDoctors()
     },
@@ -111,6 +111,12 @@ export default {
                 const res = await getDoctorsByDepartment(this.departmentId)
                 if (res.code === 200) {
                     this.doctors = this.processDoctorData(res.data || [])
+                    if (!this.departmentName && this.doctors.length > 0) {
+                        this.departmentName = this.doctors[0].departmentName || this.doctors[0].department || '科室医生'
+                    }
+                    if (!this.departmentName) {
+                        this.departmentName = '科室医生'
+                    }
                 } else {
                     uni.showToast({
                         title: res.msg || '加载失败',

@@ -159,6 +159,9 @@ export default {
                 const res = await getDoctorDetail(this.doctorId)
                 if (res.code === 200) {
                     this.doctor = res.data || {}
+                    if (!this.departmentName && this.doctor.departmentName) {
+                        this.departmentName = this.doctor.departmentName
+                    }
                 } else {
                     uni.showToast({
                         title: res.msg || '加载失败',
