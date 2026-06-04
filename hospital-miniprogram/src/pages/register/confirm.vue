@@ -210,12 +210,12 @@ export default {
                     patientGender: patient.gender,
                     patientAge: this.calculateAge(patient.birthday),
                     departmentId: this.registerData.departmentId,
-                    departmentName: this.registerData.departmentName,
+                    departmentName: this.displayDepartmentName,
                     doctorId: this.registerData.doctorId,
                     doctorName: this.registerData.doctorName,
                     scheduleId: this.registerData.scheduleId,
                     registrationType: 1,
-                    registrationFee: this.registerData.fee,
+                    registrationFee: this.displayFee,
                     visitDate: this.registerData.date,
                     visitTimeSlot: this.registerData.period === 'morning' ? '上午' : '下午',
                     remark: ''
@@ -226,7 +226,7 @@ export default {
                         url: '/pages/register/pay?data=' + encodeURIComponent(JSON.stringify({
                             registrationId: res.data.id,
                             registrationNo: res.data.registrationNo,
-                            fee: this.registerData.fee,
+                            fee: this.displayFee,
                             ...this.registerData
                         }))
                     })

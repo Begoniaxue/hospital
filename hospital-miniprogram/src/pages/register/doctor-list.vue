@@ -49,7 +49,7 @@
                         </view>
                     </view>
                     <view class="doctor-right">
-                        <text class="doctor-fee">¥{{ doctor.fee }}</text>
+                        <text class="doctor-fee">¥{{ doctor.consultationFee || doctor.fee || '0' }}</text>
                         <text class="arrow">›</text>
                     </view>
                 </view>
