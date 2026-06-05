@@ -26,7 +26,7 @@
           <el-option
             v-for="item in departmentList"
             :key="item.id"
-            :label="item.name"
+            :label="item.deptName"
             :value="item.id"
           />
         </el-select>
@@ -200,7 +200,7 @@
               <el-option
                 v-for="item in departmentList"
                 :key="item.id"
-                :label="item.name"
+                :label="item.deptName"
                 :value="item.id"
               />
             </el-select>
@@ -541,7 +541,7 @@ const handleSelectionChange = (selection) => {
 const handleDepartmentChange = (deptId) => {
   const dept = departmentList.value.find(d => d.id === deptId)
   if (dept) {
-    form.departmentName = dept.name
+    form.departmentName = dept.deptName
   }
 }
 
