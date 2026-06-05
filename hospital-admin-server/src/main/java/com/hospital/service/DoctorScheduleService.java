@@ -44,4 +44,8 @@ public interface DoctorScheduleService extends IService<DoctorSchedule> {
     boolean suspend(Long id, String reason);
 
     boolean batchGenerate(Long doctorId, LocalDate startDate, LocalDate endDate, List<String> timeSlots);
+
+    boolean batchGenerate(Long doctorId, LocalDate startDate, LocalDate endDate, List<String> timeSlots, 
+                          Integer maxCount, java.math.BigDecimal registrationFee, List<Integer> weekdays,
+                          Long departmentId, String departmentName, String doctorName);
 }

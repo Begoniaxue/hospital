@@ -252,42 +252,66 @@ public class DoctorScheduleServiceImpl extends ServiceImpl<DoctorScheduleMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean batchGenerate(Long doctorId, LocalDate startDate, LocalDate endDate, List<String> timeSlots) {
+        return batchGenerate(doctorId, startDate, endDate, timeSlots, null, null, null, null, null, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchGenerate(Long doctorId, LocalDate startDate, LocalDate endDate, List<String> timeSlots,
+                                 Integer maxCount, java.math.BigDecimal registrationFee, List<Integer> weekdays,
+                                 Long departmentId, String departmentName, String doctorName) {
         Doctor doctor = doctorMapper.selectById(doctorId);
-        if (doctor == null) {
+        if (doctor == null && departmentId == null) {
             throw new RuntimeException("医生不存在");
         }
 
+        Long finalDepartmentId = departmentId != null ? departmentId : (doctor != null ? doctor.getDepartmentId() : null);
+        String finalDepartmentName = departmentName != null ? departmentName : (doctor != null ? doctor.getDepartmentName() : null);
+        String finalDoctorName = doctorName != null ? doctorName : (doctor != null ? doctor.getName() : null);
+        java.math.BigDecimal finalFee = registrationFee != null ? registrationFee : (doctor != null ? doctor.getConsultationFee() : java.math.BigDecimal.ZERO);
+        int finalMaxCount = maxCount != null ? maxCount : 30;
+
         LocalDate date = startDate;
         while (!date.isAfter(endDate)) {
-            for (String timeSlot : timeSlots) {
-                DoctorSchedule existing = lambdaQuery()
-                        .eq(DoctorSchedule::getDoctorId, doctorId)
-                        .eq(DoctorSchedule::getScheduleDate, date)
-                        .eq(DoctorSchedule::getTimeSlot, timeSlot)
-                        .one();
-                if (existing == null) {
-                    DoctorSchedule schedule = new DoctorSchedule();
-                    schedule.setDoctorId(doctorId);
-                    schedule.setDoctorName(doctor.getName());
-                    schedule.setDepartmentId(doctor.getDepartmentId());
-                    schedule.setDepartmentName(doctor.getDepartmentName());
-                    schedule.setScheduleDate(date);
-                    schedule.setTimeSlot(timeSlot);
-                    if ("AM".equals(timeSlot)) {
-                        schedule.setStartTime(LocalTime.of(8, 0));
-                        schedule.setEndTime(LocalTime.of(11, 30));
-                    } else {
-                        schedule.setStartTime(LocalTime.of(14, 0));
-                        schedule.setEndTime(LocalTime.of(17, 30));
+            int dayOfWeek = date.getDayOfWeek().getValue();
+            if (dayOfWeek == 7) dayOfWeek = 0;
+
+            if (weekdays == null || weekdays.isEmpty() || weekdays.contains(dayOfWeek)) {
+                for (String timeSlot : timeSlots) {
+                    DoctorSchedule existing = lambdaQuery()
+                            .eq(DoctorSchedule::getDoctorId, doctorId)
+                            .eq(DoctorSchedule::getScheduleDate, date)
+                            .eq(DoctorSchedule::getTimeSlot, timeSlot)
+                            .one();
+                    if (existing == null) {
+                        DoctorSchedule schedule = new DoctorSchedule();
+                        schedule.setDoctorId(doctorId);
+                        schedule.setDoctorName(finalDoctorName);
+                        schedule.setDepartmentId(finalDepartmentId);
+                        schedule.setDepartmentName(finalDepartmentName);
+                        schedule.setScheduleDate(date);
+                        schedule.setTimeSlot(timeSlot);
+
+                        if ("上午".equals(timeSlot) || "AM".equals(timeSlot) || "morning".equals(timeSlot)) {
+                            schedule.setStartTime(LocalTime.of(8, 0));
+                            schedule.setEndTime(LocalTime.of(12, 0));
+                        } else if ("下午".equals(timeSlot) || "PM".equals(timeSlot) || "afternoon".equals(timeSlot)) {
+                            schedule.setStartTime(LocalTime.of(14, 0));
+                            schedule.setEndTime(LocalTime.of(17, 30));
+                        } else {
+                            schedule.setStartTime(LocalTime.of(8, 0));
+                            schedule.setEndTime(LocalTime.of(17, 30));
+                        }
+
+                        schedule.setMaxCount(finalMaxCount);
+                        schedule.setRemainingCount(finalMaxCount);
+                        schedule.setRegistrationFee(finalFee);
+                        schedule.setIsSuspended(0);
+                        schedule.setStatus(1);
+                        schedule.setCreateTime(LocalDateTime.now());
+                        schedule.setUpdateTime(LocalDateTime.now());
+                        save(schedule);
                     }
-                    schedule.setMaxCount(30);
-                    schedule.setRemainingCount(30);
-                    schedule.setRegistrationFee(doctor.getConsultationFee());
-                    schedule.setIsSuspended(0);
-                    schedule.setStatus(1);
-                    schedule.setCreateTime(LocalDateTime.now());
-                    schedule.setUpdateTime(LocalDateTime.now());
-                    save(schedule);
                 }
             }
             date = date.plusDays(1);

@@ -1,5 +1,27 @@
 import request from '../utils/request.js'
 
+const payMethodToNumber = (method) => {
+    const map = {
+        'wechat': 1,
+        'alipay': 2,
+        'insurance': 3,
+        'cash': 4,
+        'bank': 5
+    }
+    return map[method] || 1
+}
+
+const statusToNumber = (status) => {
+    const map = {
+        'pending_pay': 0,
+        'pending': 1,
+        'checked_in': 2,
+        'cancelled': 3,
+        'refunded': 4
+    }
+    return map[status] !== undefined ? map[status] : null
+}
+
 export const createRegistration = (data) => {
     return request({
         url: '/mini/registration/create',
@@ -9,10 +31,31 @@ export const createRegistration = (data) => {
 }
 
 export const payRegistration = (data) => {
+    const requestData = {
+        ...data,
+        payMethod: typeof data.payMethod === 'string' ? payMethodToNumber(data.payMethod) : data.payMethod
+    }
     return request({
         url: '/mini/registration/pay',
         method: 'POST',
-        data
+        data: requestData
+    })
+}
+
+export const mockPayRegistration = (data) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({
+                code: 200,
+                message: '支付成功',
+                data: {
+                    id: data.registrationId,
+                    status: 'pending',
+                    payMethod: data.payMethod,
+                    payTime: new Date().toISOString()
+                }
+            })
+        }, 1000)
     })
 }
 
@@ -25,10 +68,11 @@ export const cancelRegistration = (data) => {
 }
 
 export const getPatientRegistrations = (patientId, status, offset, limit) => {
+    const statusNum = status ? statusToNumber(status) : null
     return request({
         url: '/mini/registration/patient/' + patientId,
         method: 'GET',
-        data: { status, offset, limit }
+        data: { status: statusNum, offset, limit }
     })
 }
 

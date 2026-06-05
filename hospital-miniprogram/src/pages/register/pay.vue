@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { payRegistration } from '../../api/registration.js'
+import { mockPayRegistration, payRegistration } from '../../api/registration.js'
 
 export default {
     data() {
@@ -84,6 +84,7 @@ export default {
             paying: false,
             payData: {},
             selectedPayMethod: 'wechat',
+            useMock: true,
             payMethods: [
                 {
                     id: 'wechat',
@@ -131,22 +132,37 @@ export default {
 
             this.paying = true
             try {
-                const res = await payRegistration({
-                    registrationId: this.payData.registrationId,
-                    payMethod: this.selectedPayMethod,
-                    amount: this.payData.fee
-                })
-                
-                if (res.code === 200) {
-                    uni.redirectTo({
-                        url: '/pages/register/success?data=' + encodeURIComponent(JSON.stringify({
-                            ...this.payData,
-                            ...res.data
-                        }))
+                let res
+                if (this.useMock) {
+                    res = await mockPayRegistration({
+                        registrationId: this.payData.registrationId,
+                        payMethod: this.selectedPayMethod,
+                        amount: this.payData.fee
                     })
                 } else {
+                    res = await payRegistration({
+                        registrationId: this.payData.registrationId,
+                        payMethod: this.selectedPayMethod,
+                        amount: this.payData.fee
+                    })
+                }
+                
+                if (res.code === 200) {
                     uni.showToast({
-                        title: res.msg || '支付失败',
+                        title: '支付成功',
+                        icon: 'success'
+                    })
+                    setTimeout(() => {
+                        uni.redirectTo({
+                            url: '/pages/register/success?data=' + encodeURIComponent(JSON.stringify({
+                                ...this.payData,
+                                ...res.data
+                            }))
+                        })
+                    }, 500)
+                } else {
+                    uni.showToast({
+                        title: res.msg || res.message || '支付失败',
                         icon: 'none'
                     })
                 }

@@ -87,8 +87,15 @@ public class AdminScheduleController {
     public Result<Void> batchGenerate(@RequestParam Long doctorId,
                                       @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                       @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                                      @RequestParam(required = false) Integer maxCount,
+                                      @RequestParam(required = false) java.math.BigDecimal registrationFee,
+                                      @RequestParam(required = false) List<Integer> weekdays,
+                                      @RequestParam(required = false) Long departmentId,
+                                      @RequestParam(required = false) String departmentName,
+                                      @RequestParam(required = false) String doctorName,
                                       @RequestBody List<String> timeSlots) {
-        doctorScheduleService.batchGenerate(doctorId, startDate, endDate, timeSlots);
+        doctorScheduleService.batchGenerate(doctorId, startDate, endDate, timeSlots, 
+            maxCount, registrationFee, weekdays, departmentId, departmentName, doctorName);
         return Result.success();
     }
 }

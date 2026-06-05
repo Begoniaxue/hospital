@@ -46,11 +46,22 @@ export function suspendSchedule(id, reason) {
   })
 }
 
-export function batchGenerateSchedule(params, data) {
+export function batchGenerateSchedule(data) {
+  const { doctorId, startDate, endDate, timeSlots, maxCount, registrationFee, weekdays, departmentId, departmentName, doctorName } = data
   return request({
     url: '/admin/schedule/batch-generate',
     method: 'post',
-    params,
-    data
+    params: { 
+      doctorId, 
+      startDate, 
+      endDate,
+      maxCount,
+      registrationFee,
+      departmentId,
+      departmentName,
+      doctorName,
+      weekdays
+    },
+    data: timeSlots
   })
 }
