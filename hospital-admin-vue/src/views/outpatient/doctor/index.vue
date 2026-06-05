@@ -26,7 +26,7 @@
           <el-option
             v-for="item in departmentList"
             :key="item.id"
-            :label="item.deptName"
+            :label="item.name"
             :value="item.id"
           />
         </el-select>
@@ -200,7 +200,7 @@
               <el-option
                 v-for="item in departmentList"
                 :key="item.id"
-                :label="item.deptName"
+                :label="item.name"
                 :value="item.id"
               />
             </el-select>
@@ -519,16 +519,7 @@ const loadDepartmentList = async () => {
 }
 
 const handleQuery = async () => {
-  const params = {
-    pageNum: queryForm.pageNum,
-    pageSize: queryForm.pageSize,
-    name: queryForm.name || undefined,
-    doctorNo: queryForm.jobNo || undefined,
-    title: queryForm.title || undefined,
-    departmentId: queryForm.departmentId || undefined,
-    status: queryForm.status || undefined
-  }
-  const res = await getDoctorPage(params)
+  const res = await getDoctorPage(queryForm)
   tableData.value = res.data.records || []
   total.value = res.data.total || 0
 }
