@@ -21,12 +21,20 @@ public class AdminDoctorController {
 
     @GetMapping("/page")
     public Result<PageResult<Doctor>> page(PageQuery query,
-                                           @RequestParam(required = false) String keyword,
+                                           @RequestParam(required = false) String name,
+                                           @RequestParam(required = false) String doctorNo,
+                                           @RequestParam(required = false) String title,
                                            @RequestParam(required = false) Long departmentId,
                                            @RequestParam(required = false) Integer status) {
         QueryWrapper<Doctor> wrapper = new QueryWrapper<>();
-        if (keyword != null && !keyword.isEmpty()) {
-            wrapper.like("name", keyword).or().like("doctor_no", keyword);
+        if (name != null && !name.isEmpty()) {
+            wrapper.like("name", name);
+        }
+        if (doctorNo != null && !doctorNo.isEmpty()) {
+            wrapper.like("doctor_no", doctorNo);
+        }
+        if (title != null && !title.isEmpty()) {
+            wrapper.eq("title", title);
         }
         if (departmentId != null) {
             wrapper.eq("department_id", departmentId);

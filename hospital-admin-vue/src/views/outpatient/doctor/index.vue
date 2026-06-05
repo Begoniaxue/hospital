@@ -26,7 +26,7 @@
           <el-option
             v-for="item in departmentList"
             :key="item.id"
-            :label="item.name"
+            :label="item.deptName"
             :value="item.id"
           />
         </el-select>
@@ -200,7 +200,7 @@
               <el-option
                 v-for="item in departmentList"
                 :key="item.id"
-                :label="item.name"
+                :label="item.deptName"
                 :value="item.id"
               />
             </el-select>
@@ -425,7 +425,7 @@ import {
   getSchedulePage,
   addSchedule,
   updateSchedule,
-  deleteSchedule,
+  deleteSchedule as deleteScheduleApi,
   suspendSchedule,
   batchGenerateSchedule
 } from '@/api/schedule'
@@ -519,7 +519,16 @@ const loadDepartmentList = async () => {
 }
 
 const handleQuery = async () => {
-  const res = await getDoctorPage(queryForm)
+  const params = {
+    pageNum: queryForm.pageNum,
+    pageSize: queryForm.pageSize,
+    name: queryForm.name || undefined,
+    doctorNo: queryForm.jobNo || undefined,
+    title: queryForm.title || undefined,
+    departmentId: queryForm.departmentId || undefined,
+    status: queryForm.status || undefined
+  }
+  const res = await getDoctorPage(params)
   tableData.value = res.data.records || []
   total.value = res.data.total || 0
 }
@@ -733,7 +742,7 @@ const deleteSchedule = async (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    await deleteSchedule(row.id)
+    await deleteScheduleApi(row.id)
     ElMessage.success('删除成功')
     loadScheduleList()
   })
