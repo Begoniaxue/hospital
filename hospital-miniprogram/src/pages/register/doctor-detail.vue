@@ -135,7 +135,7 @@ export default {
         return {
             loading: false,
             doctorId: '',
-            departmentName: '',
+            urlDepartmentName: '',
             doctor: {},
             schedules: [],
             selectedDate: '',
@@ -148,9 +148,23 @@ export default {
     },
     onLoad(options) {
         this.doctorId = options.doctorId
-        this.departmentName = options.departmentName || ''
+        this.urlDepartmentName = options.departmentName || ''
         this.loadDoctorDetail()
         this.loadSchedules()
+    },
+    computed: {
+        departmentName() {
+            if (this.urlDepartmentName) {
+                return this.urlDepartmentName
+            }
+            if (this.doctor && this.doctor.departmentName) {
+                return this.doctor.departmentName
+            }
+            if (this.doctor && this.doctor.department) {
+                return this.doctor.department
+            }
+            return ''
+        }
     },
     methods: {
         async loadDoctorDetail() {
@@ -159,9 +173,6 @@ export default {
                 const res = await getDoctorDetail(this.doctorId)
                 if (res.code === 200) {
                     this.doctor = res.data || {}
-                    if (!this.departmentName && this.doctor.departmentName) {
-                        this.departmentName = this.doctor.departmentName
-                    }
                 } else {
                     uni.showToast({
                         title: res.msg || '加载失败',

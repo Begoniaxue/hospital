@@ -75,7 +75,7 @@ export default {
         return {
             loading: false,
             departmentId: '',
-            departmentName: '',
+            urlDepartmentName: '',
             selectedDate: '',
             dateList: [],
             doctors: []
@@ -83,9 +83,20 @@ export default {
     },
     onLoad(options) {
         this.departmentId = options.departmentId
-        this.departmentName = options.departmentName || ''
+        this.urlDepartmentName = options.departmentName || ''
         this.generateDateList()
         this.loadDoctors()
+    },
+    computed: {
+        departmentName() {
+            if (this.urlDepartmentName) {
+                return this.urlDepartmentName
+            }
+            if (this.doctors.length > 0) {
+                return this.doctors[0].departmentName || this.doctors[0].department || '科室医生'
+            }
+            return '科室医生'
+        }
     },
     methods: {
         generateDateList() {
@@ -111,12 +122,6 @@ export default {
                 const res = await getDoctorsByDepartment(this.departmentId)
                 if (res.code === 200) {
                     this.doctors = this.processDoctorData(res.data || [])
-                    if (!this.departmentName && this.doctors.length > 0) {
-                        this.departmentName = this.doctors[0].departmentName || this.doctors[0].department || '科室医生'
-                    }
-                    if (!this.departmentName) {
-                        this.departmentName = '科室医生'
-                    }
                 } else {
                     uni.showToast({
                         title: res.msg || '加载失败',

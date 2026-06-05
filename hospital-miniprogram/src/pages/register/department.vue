@@ -27,7 +27,7 @@
                     @click="goToDoctorList(item)"
                 >
                     <view class="result-info">
-                        <text class="result-name">{{ item.name }}</text>
+                        <text class="result-name">{{ item.deptName || item.name }}</text>
                         <text class="result-desc" v-if="item.description">{{ item.description }}</text>
                     </view>
                     <text class="arrow">›</text>
@@ -46,8 +46,8 @@
                     :key="group.id"
                 >
                     <view class="dept-group-header" @click="toggleGroup(group.id)">
-                        <text class="group-icon">{{ getGroupIcon(group.name) }}</text>
-                        <text class="group-name">{{ group.name }}</text>
+                        <text class="group-icon">{{ getGroupIcon(group.deptName || group.name) }}</text>
+                        <text class="group-name">{{ group.deptName || group.name }}</text>
                         <text class="group-count">{{ group.children ? group.children.length : 0 }}个科室</text>
                         <text class="group-arrow" :class="{ expanded: expandedGroups.includes(group.id) }">›</text>
                     </view>
@@ -59,7 +59,7 @@
                             @click="goToDoctorList(subDept)"
                         >
                             <view class="sub-dept-info">
-                                <text class="sub-dept-name">{{ subDept.name }}</text>
+                                <text class="sub-dept-name">{{ subDept.deptName || subDept.name }}</text>
                                 <text class="sub-dept-desc" v-if="subDept.description">{{ subDept.description }}</text>
                             </view>
                             <view class="sub-dept-right">
@@ -167,8 +167,9 @@ export default {
         },
 
         goToDoctorList(dept) {
+            const deptName = dept.deptName || dept.name || ''
             uni.navigateTo({
-                url: '/pages/register/doctor-list?departmentId=' + dept.id + '&departmentName=' + dept.name
+                url: '/pages/register/doctor-list?departmentId=' + dept.id + '&departmentName=' + encodeURIComponent(deptName)
             })
         }
     }
