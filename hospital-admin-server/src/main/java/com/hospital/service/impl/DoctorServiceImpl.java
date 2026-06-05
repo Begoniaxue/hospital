@@ -7,9 +7,12 @@ import com.hospital.common.PageQuery;
 import com.hospital.common.PageResult;
 import com.hospital.entity.Doctor;
 import com.hospital.mapper.DoctorMapper;
+import com.hospital.mapper.DoctorScheduleMapper;
+import com.hospital.mapper.RegistrationMapper;
 import com.hospital.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +23,12 @@ public class DoctorServiceImpl extends ServiceImpl<DoctorMapper, Doctor> impleme
 
     @Autowired
     private DoctorMapper doctorMapper;
+
+    @Autowired
+    private RegistrationMapper registrationMapper;
+
+    @Autowired
+    private DoctorScheduleMapper doctorScheduleMapper;
 
     @Override
     public PageResult<Doctor> getDoctorPage(PageQuery pageQuery, String keyword, Long departmentId, Integer status) {
@@ -70,9 +79,29 @@ public class DoctorServiceImpl extends ServiceImpl<DoctorMapper, Doctor> impleme
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateDoctor(Doctor doctor) {
+        Doctor oldDoctor = getById(doctor.getId());
+        if (oldDoctor == null) {
+            return false;
+        }
+        
         doctor.setUpdateTime(LocalDateTime.now());
-        return updateById(doctor);
+        boolean result = updateById(doctor);
+        
+        if (result) {
+            if (doctor.getName() != null && !doctor.getName().equals(oldDoctor.getName())) {
+                registrationMapper.updateDoctorNameByDoctorId(doctor.getId(), doctor.getName());
+                doctorScheduleMapper.updateDoctorNameByDoctorId(doctor.getId(), doctor.getName());
+            }
+            
+            if (doctor.getDepartmentId() != null && !doctor.getDepartmentId().equals(oldDoctor.getDepartmentId())) {
+                String departmentName = doctor.getDepartmentName() != null ? doctor.getDepartmentName() : oldDoctor.getDepartmentName();
+                doctorScheduleMapper.updateDepartmentByDoctorId(doctor.getId(), doctor.getDepartmentId(), departmentName);
+            }
+        }
+        
+        return result;
     }
 
     @Override

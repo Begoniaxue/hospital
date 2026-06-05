@@ -46,4 +46,7 @@ public interface RegistrationMapper extends BaseMapper<Registration> {
     List<RegistrationReportDTO> selectRegistrationStats(@Param("startDate") String startDate, 
                                                         @Param("endDate") String endDate, 
                                                         @Param("department") String department);
+
+    @Update("UPDATE registration SET doctor_name = #{doctorName} WHERE doctor_id = #{doctorId} AND deleted = 0")
+    int updateDoctorNameByDoctorId(@Param("doctorId") Long doctorId, @Param("doctorName") String doctorName);
 }

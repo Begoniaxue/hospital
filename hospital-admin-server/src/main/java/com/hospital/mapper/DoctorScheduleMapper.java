@@ -30,4 +30,10 @@ public interface DoctorScheduleMapper extends BaseMapper<DoctorSchedule> {
 
     @Update("UPDATE doctor_schedule SET remaining_count = remaining_count + 1 WHERE id = #{id} AND is_suspended = 0 AND deleted = 0")
     int increaseRemainingCount(@Param("id") Long id);
+
+    @Update("UPDATE doctor_schedule SET doctor_name = #{doctorName} WHERE doctor_id = #{doctorId} AND deleted = 0")
+    int updateDoctorNameByDoctorId(@Param("doctorId") Long doctorId, @Param("doctorName") String doctorName);
+
+    @Update("UPDATE doctor_schedule SET department_name = #{departmentName}, department_id = #{departmentId} WHERE doctor_id = #{doctorId} AND deleted = 0")
+    int updateDepartmentByDoctorId(@Param("doctorId") Long doctorId, @Param("departmentId") Long departmentId, @Param("departmentName") String departmentName);
 }
