@@ -258,20 +258,20 @@ public class MiniProfileController {
     }
 
     @PostMapping("/messageSettings")
-    public Result<?> saveMessageSettings(@RequestParam Long patientId,
-                                          @RequestBody Map<String, Boolean> settings) {
+    public Result<?> saveMessageSettings(@RequestBody Map<String, Object> params) {
+        Long patientId = Long.valueOf(params.get("patientId").toString());
         String prefix = "message:setting:" + patientId + ":";
-        if (settings.containsKey("appointmentNotice")) {
-            setBooleanSetting(prefix + "appointmentNotice", settings.get("appointmentNotice"));
+        if (params.containsKey("appointmentNotice")) {
+            setBooleanSetting(prefix + "appointmentNotice", Boolean.TRUE.equals(params.get("appointmentNotice")));
         }
-        if (settings.containsKey("paymentNotice")) {
-            setBooleanSetting(prefix + "paymentNotice", settings.get("paymentNotice"));
+        if (params.containsKey("paymentNotice")) {
+            setBooleanSetting(prefix + "paymentNotice", Boolean.TRUE.equals(params.get("paymentNotice")));
         }
-        if (settings.containsKey("reportNotice")) {
-            setBooleanSetting(prefix + "reportNotice", settings.get("reportNotice"));
+        if (params.containsKey("reportNotice")) {
+            setBooleanSetting(prefix + "reportNotice", Boolean.TRUE.equals(params.get("reportNotice")));
         }
-        if (settings.containsKey("systemNotice")) {
-            setBooleanSetting(prefix + "systemNotice", settings.get("systemNotice"));
+        if (params.containsKey("systemNotice")) {
+            setBooleanSetting(prefix + "systemNotice", Boolean.TRUE.equals(params.get("systemNotice")));
         }
         return Result.success("消息设置保存成功");
     }

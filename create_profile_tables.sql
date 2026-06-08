@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS `doctor_review` (
   `images` varchar(1024) DEFAULT NULL COMMENT '图片URL，多个逗号分隔',
   `status` int DEFAULT '0' COMMENT '状态 0待审核 1已通过 2已驳回',
   `reply` varchar(1024) DEFAULT NULL COMMENT '管理员回复',
+  `reply_user_id` bigint DEFAULT NULL COMMENT '回复人ID',
+  `reply_user_name` varchar(64) DEFAULT NULL COMMENT '回复人姓名',
   `reply_time` datetime DEFAULT NULL COMMENT '回复时间',
   `his_sync_status` int DEFAULT '0' COMMENT 'HIS同步状态 0未同步 1已同步',
   `his_sync_time` datetime DEFAULT NULL COMMENT 'HIS同步时间',
