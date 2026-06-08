@@ -42,8 +42,8 @@ public class MiniRegistrationController {
         String operatorName = null;
 
         if (username.startsWith("WECHAT_")) {
-            Long userId = Long.parseLong(username.substring(7));
-            WechatUser wechatUser = wechatUserService.getById(userId);
+            String openid = username.substring(7);
+            WechatUser wechatUser = wechatUserService.getByOpenid(openid);
             if (wechatUser != null) {
                 operatorId = wechatUser.getId();
                 operatorName = wechatUser.getNickname();

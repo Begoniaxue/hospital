@@ -96,9 +96,7 @@ export default {
     computed: {
         patientId() {
             return this.$store.state.wechatUser?.currentPatientId
-                || this.$store.state.currentPatient?.id
                 || uni.getStorageSync('wechatUser')?.currentPatientId
-                || uni.getStorageSync('currentPatient')?.id
         }
     },
     onShow() {

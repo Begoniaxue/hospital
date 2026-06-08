@@ -95,11 +95,7 @@ public class AuthController {
 
     @GetMapping("/userInfo")
     public Result<SysUser> getUserInfo(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Result.error(401, "未登录或登录已过期");
-        }
-        String token = authHeader.substring(7);
+        String token = request.getHeader("Authorization").substring(7);
         String username = jwtUtil.getUsernameFromToken(token);
         SysUser user = sysUserService.getByUsername(username);
         return Result.success(user);
@@ -107,11 +103,7 @@ public class AuthController {
 
     @GetMapping("/menu")
     public Result<?> getMenu(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Result.error(401, "未登录或登录已过期");
-        }
-        String token = authHeader.substring(7);
+        String token = request.getHeader("Authorization").substring(7);
         String username = jwtUtil.getUsernameFromToken(token);
         SysUser user = sysUserService.getByUsername(username);
         return Result.success(sysPermissionService.getMenuTree(user.getId()));
@@ -119,11 +111,7 @@ public class AuthController {
 
     @PostMapping("/updatePassword")
     public Result<?> updatePassword(@RequestBody UpdatePasswordDTO dto, HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Result.error(401, "未登录或登录已过期");
-        }
-        String token = authHeader.substring(7);
+        String token = request.getHeader("Authorization").substring(7);
         String username = jwtUtil.getUsernameFromToken(token);
         SysUser user = sysUserService.getByUsername(username);
         boolean success = sysUserService.updatePassword(user.getId(), dto.getOldPassword(), dto.getNewPassword());

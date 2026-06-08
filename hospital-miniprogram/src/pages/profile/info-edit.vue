@@ -105,7 +105,7 @@ export default {
         }
     },
     onLoad(options) {
-        this.form.id = Number(options.patientId)
+        this.form.id = options.patientId
         this.loadPatientInfo(options.patientId)
     },
     methods: {
@@ -115,16 +115,16 @@ export default {
             try {
                 const res = await getPatientInfo(patientId)
                 if (res.code === 200) {
-                    const data = res.data
+                    const { phone, address, allergyHistory, medicalHistory, emergencyContact, emergencyPhone, remark } = res.data
                     this.form = {
-                        id: Number(data.id),
-                        phone: data.phone || '',
-                        address: data.address || '',
-                        allergyHistory: data.allergyHistory || '',
-                        medicalHistory: data.medicalHistory || '',
-                        emergencyContact: data.emergencyContact || '',
-                        emergencyPhone: data.emergencyPhone || '',
-                        remark: data.remark || ''
+                        ...this.form,
+                        phone,
+                        address,
+                        allergyHistory,
+                        medicalHistory,
+                        emergencyContact,
+                        emergencyPhone,
+                        remark
                     }
                 }
             } catch (e) {
