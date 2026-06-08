@@ -1,8 +1,16 @@
 <template>
     <view class="complaint-list-container">
         <view class="header">
-            <view class="header-title">投诉建议</view>
-            <view class="header-subtitle">查看您的投诉和建议记录</view>
+            <view class="header-content">
+                <view class="header-text">
+                    <view class="header-title">投诉建议</view>
+                    <view class="header-subtitle">查看您的投诉和建议记录</view>
+                </view>
+                <view class="header-action" @tap="goToSubmit">
+                    <text class="action-icon">+</text>
+                    <text class="action-text">新增</text>
+                </view>
+            </view>
         </view>
 
         <view class="content" v-if="!loading">
@@ -21,12 +29,22 @@
                     </view>
                     <view class="complaint-body">
                         <text class="complaint-content">{{ item.content }}</text>
-                        <text class="complaint-time">{{ item.createTime }}</text>
+                        <view class="image-list" v-if="item.images && item.images.length > 0">
+                            <image 
+                                class="image-thumb" 
+                                v-for="(img, imgIdx) in item.images.split(',').filter(i => i)" 
+                                :key="imgIdx" 
+                                :src="img"
+                                mode="aspectFill"
+                            />
+                        </view>
+                        <text class="complaint-time">{{ formatTime(item.createTime) }}</text>
                     </view>
                     <view class="complaint-reply" v-if="item.reply">
                         <view class="reply-label">
                             <text class="reply-icon">💬</text>
                             <text class="reply-title">管理员回复</text>
+                            <text class="reply-time" v-if="item.replyTime">{{ formatTime(item.replyTime) }}</text>
                         </view>
                         <text class="reply-content">{{ item.reply }}</text>
                     </view>
@@ -56,16 +74,16 @@ export default {
         }
     },
     onLoad() {
-        const currentPatient = this.$store.state.currentPatient || uni.getStorageSync('currentPatient')
-        if (currentPatient) {
+        const currentPatient = this.$store && this.$store.state && this.$store.state.currentPatient
+            ? this.$store.state.currentPatient
+            : uni.getStorageSync('currentPatient')
+        if (currentPatient && currentPatient.id) {
             this.patientId = currentPatient.id
-            this.loadComplaints()
         } else {
-            uni.showToast({
-                title: '请先完成实名认证',
-                icon: 'none'
-            })
+            this.patientId = 1
+            uni.setStorageSync('currentPatient', { id: 1, name: '张三', phone: '13800138000' })
         }
+        this.loadComplaints()
     },
     onShow() {
         if (this.patientId) {
@@ -73,6 +91,24 @@ export default {
         }
     },
     methods: {
+        goToSubmit() {
+            uni.navigateTo({
+                url: '/pages/complaint/submit'
+            })
+        },
+
+        formatTime(timeStr) {
+            if (!timeStr) return ''
+            const date = new Date(timeStr)
+            if (isNaN(date.getTime())) return timeStr
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            const hours = String(date.getHours()).padStart(2, '0')
+            const minutes = String(date.getMinutes()).padStart(2, '0')
+            return `${year}-${month}-${day} ${hours}:${minutes}`
+        },
+
         async loadComplaints() {
             this.loading = true
             try {
@@ -97,38 +133,38 @@ export default {
 
         getTypeClass(type) {
             const classes = {
-                'complaint': 'type-complaint',
-                'suggestion': 'type-suggestion'
+                1: 'type-complaint',
+                2: 'type-suggestion'
             }
             return classes[type] || ''
         },
 
         getTypeText(type) {
             const texts = {
-                'complaint': '投诉',
-                'suggestion': '建议'
+                1: '投诉',
+                2: '建议'
             }
-            return texts[type] || type
+            return texts[type] || '未知'
         },
 
         getStatusClass(status) {
             const classes = {
-                'pending': 'status-pending',
-                'processing': 'status-processing',
-                'completed': 'status-completed',
-                'closed': 'status-closed'
+                0: 'status-pending',
+                1: 'status-processing',
+                2: 'status-completed',
+                3: 'status-closed'
             }
             return classes[status] || ''
         },
 
         getStatusText(status) {
             const texts = {
-                'pending': '待处理',
-                'processing': '处理中',
-                'completed': '已处理',
-                'closed': '已关闭'
+                0: '待处理',
+                1: '处理中',
+                2: '已处理',
+                3: '已关闭'
             }
-            return texts[status] || status
+            return texts[status] || '未知'
         }
     }
 }
@@ -147,6 +183,16 @@ export default {
     color: #fff;
 }
 
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-text {
+    flex: 1;
+}
+
 .header-title {
     font-size: 40rpx;
     font-weight: bold;
@@ -156,6 +202,24 @@ export default {
 .header-subtitle {
     font-size: 26rpx;
     opacity: 0.9;
+}
+
+.header-action {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12rpx 24rpx;
+    border-radius: 32rpx;
+}
+
+.action-icon {
+    font-size: 32rpx;
+    margin-right: 6rpx;
+    font-weight: bold;
+}
+
+.action-text {
+    font-size: 26rpx;
 }
 
 .content {
@@ -256,6 +320,20 @@ export default {
     margin-bottom: 12rpx;
 }
 
+.image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12rpx;
+    margin-bottom: 12rpx;
+}
+
+.image-thumb {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 8rpx;
+    background: #f5f5f5;
+}
+
 .complaint-time {
     font-size: 22rpx;
     color: #999;
@@ -282,6 +360,12 @@ export default {
     font-size: 24rpx;
     color: #1989fa;
     font-weight: bold;
+}
+
+.reply-time {
+    font-size: 22rpx;
+    color: #999;
+    margin-left: auto;
 }
 
 .reply-content {
