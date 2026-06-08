@@ -29,12 +29,12 @@
                 <view 
                     class="order-card" 
                     v-for="order in orders" 
-                    :key="order.id"
+                    :key="order.type + '-' + order.id"
                     @click="viewDetail(order)"
                 >
                     <view class="order-header">
                         <text class="order-no">订单号：{{ order.orderNo }}</text>
-                        <text class="order-status" :class="getStatusClass(order.status)">{{ getStatusText(order.status) }}</text>
+                        <text class="order-status" :class="getStatusClass(order.type, order.status)">{{ order.statusName }}</text>
                     </view>
                     <view class="order-body">
                         <view class="order-info">
@@ -48,7 +48,7 @@
                             </view>
                             <view class="order-time">
                                 <text class="time-icon">🕒</text>
-                                {{ order.createTime }}
+                                {{ formatTime(order.createTime) }}
                             </view>
                         </view>
                         <text class="arrow">›</text>
@@ -86,25 +86,19 @@ export default {
             tabs: [
                 { label: '全部', value: 'all' },
                 { label: '挂号', value: 'registration' },
-                { label: '缴费', value: 'payment' },
+                { label: '缴费', value: 'settlement' },
                 { label: '处方', value: 'prescription' },
-                { label: '住院预缴', value: 'hospital' }
+                { label: '住院预缴', value: 'deposit' }
             ],
             orders: [],
             patientId: ''
         }
     },
-    onLoad() {
-        const currentPatient = this.$store.state.currentPatient || uni.getStorageSync('currentPatient')
-        if (currentPatient) {
-            this.patientId = currentPatient.id
-            this.loadOrders()
-        } else {
-            uni.showToast({
-                title: '请先完成实名认证',
-                icon: 'none'
-            })
+    onLoad(options) {
+        if (options && options.type) {
+            this.activeTab = options.type
         }
+        this.initPatient()
     },
     onShow() {
         if (this.patientId) {
@@ -112,25 +106,42 @@ export default {
         }
     },
     methods: {
+        initPatient() {
+            const currentPatient = this.$store && this.$store.state && this.$store.state.currentPatient
+                ? this.$store.state.currentPatient
+                : uni.getStorageSync('currentPatient')
+            if (currentPatient && currentPatient.id) {
+                this.patientId = currentPatient.id
+                this.loadOrders()
+            } else {
+                this.patientId = 1
+                uni.setStorageSync('currentPatient', { id: 1, name: '张三', phone: '13800138000' })
+                this.loadOrders()
+            }
+        },
+
         async loadOrders() {
             this.loading = true
             try {
-                const type = this.activeTab === 'all' ? '' : this.activeTab
+                const type = this.activeTab
                 const res = await getOrders(this.patientId, type)
                 if (res.code === 200) {
+                    const list = (res.data && res.data.list) || res.data || []
                     if (this.page === 0) {
-                        this.orders = res.data || []
+                        this.orders = list
                     } else {
-                        this.orders = this.orders.concat(res.data || [])
+                        this.orders = this.orders.concat(list)
                     }
-                    this.noMore = (res.data || []).length < this.pageSize
+                    const total = (res.data && res.data.total) || list.length
+                    this.noMore = this.orders.length >= total || list.length < this.pageSize
                 } else {
                     uni.showToast({
-                        title: res.msg || '加载失败',
+                        title: res.msg || res.message || '加载失败',
                         icon: 'none'
                     })
                 }
             } catch (e) {
+                console.error('加载订单失败:', e)
                 uni.showToast({
                     title: '网络错误，请稍后重试',
                     icon: 'none'
@@ -164,9 +175,9 @@ export default {
         getTypeIcon(type) {
             const icons = {
                 'registration': '🏥',
-                'payment': '💳',
+                'settlement': '💳',
                 'prescription': '💊',
-                'hospital': '🛏️'
+                'deposit': '🛏️'
             }
             return icons[type] || '📋'
         },
@@ -175,38 +186,49 @@ export default {
             const texts = {
                 'all': '全部',
                 'registration': '挂号',
-                'payment': '缴费',
+                'settlement': '缴费',
                 'prescription': '处方',
-                'hospital': '住院预缴'
+                'deposit': '住院预缴'
             }
             return texts[type] || type
         },
 
-        getStatusClass(status) {
-            const classes = {
-                'pending_pay': 'status-pending-pay',
-                'paid': 'status-paid',
-                'completed': 'status-completed',
-                'cancelled': 'status-cancelled',
-                'refunded': 'status-refunded'
+        getStatusClass(type, status) {
+            if (type === 'registration') {
+                if (status === 0) return 'status-pending-pay'
+                if (status === 1) return 'status-paid'
+                if (status === 2) return 'status-completed'
+                if (status === 3) return 'status-cancelled'
+                if (status === 4) return 'status-refunded'
             }
-            return classes[status] || ''
+            if (type === 'settlement') {
+                if (status === 0) return 'status-pending-pay'
+                if (status === 1) return 'status-paid'
+                if (status === 2) return 'status-refunded'
+            }
+            if (type === 'prescription') {
+                if (status === 0) return 'status-pending-pay'
+                if (status === 1) return 'status-paid'
+                if (status === 2) return 'status-pending-pay'
+                if (status === 3) return 'status-completed'
+            }
+            if (type === 'deposit') {
+                if (status === 0) return 'status-pending-pay'
+                if (status === 1) return 'status-paid'
+                if (status === 2) return 'status-refunded'
+            }
+            return ''
         },
 
-        getStatusText(status) {
-            const texts = {
-                'pending_pay': '待支付',
-                'paid': '已支付',
-                'completed': '已完成',
-                'cancelled': '已取消',
-                'refunded': '已退费'
-            }
-            return texts[status] || status
+        formatTime(timeStr) {
+            if (!timeStr) return ''
+            const t = String(timeStr).replace('T', ' ')
+            return t.substring(0, 16)
         },
 
         viewDetail(order) {
             uni.showToast({
-                title: '订单详情：' + order.orderNo,
+                title: '订单号：' + order.orderNo,
                 icon: 'none'
             })
         }
@@ -313,8 +335,8 @@ export default {
 }
 
 .status-completed {
-    color: #8c8c8c;
-    background: #f5f5f5;
+    color: #52c41a;
+    background: #f6ffed;
 }
 
 .status-cancelled, .status-refunded {
