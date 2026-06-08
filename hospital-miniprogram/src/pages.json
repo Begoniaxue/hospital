@@ -200,6 +200,66 @@
             "style": {
                 "navigationBarTitleText": "搜索"
             }
+        },
+        {
+            "path": "pages/order/list",
+            "style": {
+                "navigationBarTitleText": "我的订单"
+            }
+        },
+        {
+            "path": "pages/review/list",
+            "style": {
+                "navigationBarTitleText": "我的评价"
+            }
+        },
+        {
+            "path": "pages/review/submit",
+            "style": {
+                "navigationBarTitleText": "提交评价"
+            }
+        },
+        {
+            "path": "pages/complaint/list",
+            "style": {
+                "navigationBarTitleText": "投诉建议"
+            }
+        },
+        {
+            "path": "pages/complaint/submit",
+            "style": {
+                "navigationBarTitleText": "提交投诉建议"
+            }
+        },
+        {
+            "path": "pages/settings/message",
+            "style": {
+                "navigationBarTitleText": "消息设置"
+            }
+        },
+        {
+            "path": "pages/settings/security",
+            "style": {
+                "navigationBarTitleText": "账号安全"
+            }
+        },
+        {
+            "path": "pages/settings/phone",
+            "style": {
+                "navigationBarTitleText": "修改手机号"
+            }
+        },
+        {
+            "path": "pages/settings/about",
+            "style": {
+                "navigationBarTitleText": "关于医院"
+            }
+        },
+        {
+            "path": "pages/settings/privacy",
+            "style": {
+                "navigationBarTitleText": "隐私协议"
+            }
         }
     ],
     "globalStyle": {

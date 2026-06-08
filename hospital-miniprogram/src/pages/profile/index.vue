@@ -49,25 +49,25 @@
                 <text class="stats-more" @click="handleAllOrders">全部订单 ›</text>
             </view>
             <view class="stats-grid">
-                <view class="stats-item" @click="handleOrder('appointment')">
+                <view class="stats-item" @click="handleOrder('registration')">
                     <text class="stats-icon">📅</text>
-                    <text class="stats-text">预约挂号</text>
+                    <text class="stats-text">挂号订单</text>
                 </view>
-                <view class="stats-item" @click="handleOrder('payment')">
+                <view class="stats-item" @click="handleOrder('settlement')">
                     <text class="stats-icon">💰</text>
-                    <text class="stats-text">待缴费</text>
+                    <text class="stats-text">缴费订单</text>
                 </view>
-                <view class="stats-item" @click="handleOrder('pharmacy')">
+                <view class="stats-item" @click="handleOrder('prescription')">
                     <text class="stats-icon">💊</text>
-                    <text class="stats-text">待取药</text>
+                    <text class="stats-text">处方订单</text>
                 </view>
-                <view class="stats-item" @click="handleOrder('report')">
-                    <text class="stats-icon">📋</text>
-                    <text class="stats-text">查报告</text>
+                <view class="stats-item" @click="handleOrder('deposit')">
+                    <text class="stats-icon">🏥</text>
+                    <text class="stats-text">住院预缴</text>
                 </view>
-                <view class="stats-item" @click="handleOrder('refund')">
-                    <text class="stats-icon">↩️</text>
-                    <text class="stats-text">退号退款</text>
+                <view class="stats-item" @click="navigateTo('/pages/review/list')">
+                    <text class="stats-icon">⭐</text>
+                    <text class="stats-text">我的评价</text>
                 </view>
             </view>
         </view>
@@ -194,24 +194,11 @@ export default {
         },
 
         handleAllOrders() {
-            uni.showToast({
-                title: '功能开发中',
-                icon: 'none'
-            })
+            this.navigateTo('/pages/order/list?type=all')
         },
 
         handleOrder(type) {
-            uni.showToast({
-                title: '功能开发中',
-                icon: 'none'
-            })
-        },
-
-        handleMenu(type) {
-            uni.showToast({
-                title: '功能开发中',
-                icon: 'none'
-            })
+            this.navigateTo('/pages/order/list?type=' + type)
         },
 
         handleLogout() {
