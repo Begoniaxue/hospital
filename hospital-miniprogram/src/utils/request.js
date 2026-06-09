@@ -1,8 +1,11 @@
 // #ifdef H5
+const BASE_URL = '/api'
+// #endif
+// #ifdef MP-WEIXIN
 const BASE_URL = 'http://localhost:8080/api'
 // #endif
-// #ifndef H5
-const BASE_URL = '/api'
+// #ifdef APP-PLUS
+const BASE_URL = 'http://localhost:8080/api'
 // #endif
 
 const statusMap = {
