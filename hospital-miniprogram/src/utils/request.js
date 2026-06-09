@@ -99,10 +99,19 @@ const request = (options) => {
             header['Authorization'] = 'Bearer ' + token
         }
 
+        const method = (options.method || 'GET').toUpperCase()
+        let requestData = options.data
+        if (method === 'GET') {
+            if (requestData === undefined || requestData === null || 
+                (typeof requestData === 'object' && Object.keys(requestData).length === 0)) {
+                requestData = undefined
+            }
+        }
+
         uni.request({
             url: BASE_URL + options.url,
-            method: options.method || 'GET',
-            data: options.data || {},
+            method: method,
+            data: requestData,
             header: header,
             timeout: 10000,
             success: (res) => {
