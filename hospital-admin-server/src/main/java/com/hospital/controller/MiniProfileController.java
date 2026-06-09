@@ -86,7 +86,9 @@ public class MiniProfileController {
                 order.put("createTime", reg.getCreateTime());
                 Map<String, Object> detail = new HashMap<>();
                 detail.put("patientName", reg.getPatientName());
+                detail.put("departmentId", reg.getDepartmentId());
                 detail.put("department", reg.getDepartment());
+                detail.put("doctorId", reg.getDoctorId());
                 detail.put("doctorName", reg.getDoctorName());
                 detail.put("visitDate", reg.getVisitDate());
                 detail.put("visitTimeSlot", reg.getVisitTimeSlot());

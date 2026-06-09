@@ -53,6 +53,14 @@
                         </view>
                         <text class="arrow">›</text>
                     </view>
+                    <view class="order-footer" v-if="order.type === 'registration' && order.status === 4">
+                        <view class="footer-left">
+                            <text class="doctor-info" v-if="order.detail">
+                                就诊医生：{{ order.detail.doctorName }} · {{ order.detail.department }}
+                            </text>
+                        </view>
+                        <button class="review-btn" @click.stop="goToReview(order)">去评价</button>
+                    </view>
                 </view>
             </view>
             <view class="empty-box" v-else-if="!loading">
@@ -199,7 +207,7 @@ export default {
                 if (status === 1) return 'status-paid'
                 if (status === 2) return 'status-completed'
                 if (status === 3) return 'status-cancelled'
-                if (status === 4) return 'status-refunded'
+                if (status === 4) return 'status-completed'
             }
             if (type === 'settlement') {
                 if (status === 0) return 'status-pending-pay'
@@ -230,6 +238,26 @@ export default {
             uni.showToast({
                 title: '订单号：' + order.orderNo,
                 icon: 'none'
+            })
+        },
+
+        goToReview(order) {
+            if (!order || !order.detail) {
+                uni.showToast({
+                    title: '订单数据不完整',
+                    icon: 'none'
+                })
+                return
+            }
+            const params = [
+                'registrationId=' + order.id,
+                'doctorId=' + (order.detail.doctorId || ''),
+                'doctorName=' + encodeURIComponent(order.detail.doctorName || ''),
+                'departmentId=' + (order.detail.departmentId || ''),
+                'departmentName=' + encodeURIComponent(order.detail.department || '')
+            ].join('&')
+            uni.navigateTo({
+                url: '/pages/review/submit?' + params
             })
         }
     }
@@ -448,5 +476,36 @@ export default {
 .no-more-text {
     font-size: 24rpx;
     color: #ccc;
+}
+
+.order-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20rpx 24rpx;
+    border-top: 1rpx solid #f0f0f0;
+    background: #fafafa;
+}
+
+.footer-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.doctor-info {
+    font-size: 24rpx;
+    color: #999;
+}
+
+.review-btn {
+    margin: 0;
+    padding: 0 24rpx;
+    height: 56rpx;
+    line-height: 56rpx;
+    font-size: 24rpx;
+    color: #fff;
+    background: linear-gradient(135deg, #ff6b6b 0%, #fa5252 100%);
+    border-radius: 28rpx;
+    border: none;
 }
 </style>
