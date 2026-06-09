@@ -106,6 +106,11 @@
                 <text class="menu-text">收货地址</text>
                 <text class="menu-arrow">›</text>
             </view>
+            <view class="menu-item" @click="navigateTo('/pages/complaint/list')">
+                <text class="menu-icon">📢</text>
+                <text class="menu-text">投诉建议</text>
+                <text class="menu-arrow">›</text>
+            </view>
             <view class="menu-item" @click="handleMenu('feedback')">
                 <text class="menu-icon">💬</text>
                 <text class="menu-text">意见反馈</text>
