@@ -55,7 +55,7 @@
             "mode" : "hash"
         },
         "devServer" : {
-            "port" : 8081,
+            "port" : 5173,
             "proxy" : {
                 "/api" : {
                     "target" : "http://localhost:8080",
