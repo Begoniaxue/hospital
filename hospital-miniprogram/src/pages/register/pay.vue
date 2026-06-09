@@ -132,20 +132,11 @@ export default {
 
             this.paying = true
             try {
-                let res
-                if (this.useMock) {
-                    res = await mockPayRegistration({
-                        registrationId: this.payData.registrationId,
-                        payMethod: this.selectedPayMethod,
-                        amount: this.payData.fee
-                    })
-                } else {
-                    res = await payRegistration({
-                        registrationId: this.payData.registrationId,
-                        payMethod: this.selectedPayMethod,
-                        amount: this.payData.fee
-                    })
-                }
+                const res = await mockPayRegistration({
+                    registrationId: this.payData.registrationId,
+                    payMethod: this.selectedPayMethod,
+                    amount: this.payData.fee
+                })
                 
                 if (res.code === 200) {
                     uni.showToast({
@@ -156,7 +147,8 @@ export default {
                         uni.redirectTo({
                             url: '/pages/register/success?data=' + encodeURIComponent(JSON.stringify({
                                 ...this.payData,
-                                ...res.data
+                                ...res.data,
+                                orderNo: res.data.registrationNo || this.payData.orderNo
                             }))
                         })
                     }, 500)
@@ -167,8 +159,9 @@ export default {
                     })
                 }
             } catch (e) {
+                console.error('支付错误:', e)
                 uni.showToast({
-                    title: '网络错误，请稍后重试',
+                    title: e.message || '网络错误，请稍后重试',
                     icon: 'none'
                 })
             } finally {

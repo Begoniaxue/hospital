@@ -134,7 +134,7 @@ public class RegistrationServiceImpl extends ServiceImpl<RegistrationMapper, Reg
     public RegistrationVO pay(RegistrationPayDTO dto, Long operatorId, String operatorName) {
         Registration registration = getById(dto.getRegistrationId());
         if (registration == null) {
-            return null;
+            throw new RuntimeException("挂号单不存在");
         }
         if (registration.getStatus() != 0) {
             throw new RuntimeException("当前状态不允许支付");
@@ -147,12 +147,15 @@ public class RegistrationServiceImpl extends ServiceImpl<RegistrationMapper, Reg
         registration.setUpdateBy(operatorId);
         updateById(registration);
 
-        messageNotificationService.sendRegistrationSuccess(
-                registration.getId(),
-                null,
-                registration.getPatientId(),
-                registration.getPatientName()
-        );
+        try {
+            messageNotificationService.sendRegistrationSuccess(
+                    registration.getId(),
+                    registration.getPatientId(),
+                    registration.getPatientId(),
+                    registration.getPatientName()
+            );
+        } catch (Exception e) {
+        }
 
         return convertToVO(registration);
     }

@@ -43,37 +43,14 @@ export const payRegistration = (data) => {
 }
 
 export const mockPayRegistration = async (data) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(async () => {
-            try {
-                const payMethodNum = typeof data.payMethod === 'string' ? payMethodToNumber(data.payMethod) : data.payMethod
-                const backendRes = await request({
-                    url: '/mini/registration/pay',
-                    method: 'POST',
-                    data: {
-                        registrationId: data.registrationId,
-                        payMethod: payMethodNum
-                    }
-                })
-                
-                if (backendRes.code === 200) {
-                    resolve({
-                        code: 200,
-                        message: '支付成功',
-                        data: {
-                            id: data.registrationId,
-                            status: 'pending',
-                            payMethod: data.payMethod,
-                            payTime: new Date().toISOString()
-                        }
-                    })
-                } else {
-                    reject(new Error(backendRes.message || '支付失败'))
-                }
-            } catch (e) {
-                reject(e)
-            }
-        }, 1000)
+    const payMethodNum = typeof data.payMethod === 'string' ? payMethodToNumber(data.payMethod) : data.payMethod
+    return request({
+        url: '/mini/registration/pay',
+        method: 'POST',
+        data: {
+            registrationId: data.registrationId,
+            payMethod: payMethodNum
+        }
     })
 }
 
